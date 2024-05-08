@@ -2,64 +2,58 @@
 
 using namespace std;
 
-class Solution
+vector<int> Dijkstra(int v, vector<vector<int>> graph[], int s)
 {
-    public:
-        vector<int> dijkstra(int v, vector<vector<int>> adj[], int s){
-            
-            set<pair<int, int>> st;
 
-            vector<int> dist(v, 1e9);
+    set<pair<int, int>> st;
 
-            st.insert({0, s});
+    vector<int> dist(v, 1e9);
 
-            dist[s] = 0;
+    st.insert({0, s});
 
-            while(!st.empty()){
+    dist[s] = 0;
 
-                auto it = *(st.begin());
-                int node = it.second;
-                int dis = it.first;
-		st.erase(it);
+    while(!st.empty())
+    {
+        auto it = *(st.begin());
+        int dis = it.first;
+        int node = it.second;
+        st.erase(it);
 
-                for(auto it : adj[node]){
-                    int adjNode = it[0];
-                    int adjWt = it[1];
+        for(auto it : graph[node])
+        {
+            int adjNode = it[0];
+            int adjDis = it[1];
 
-                    if(dis + adjWt < dist[adjNode]){
+            if(dis + adjDis < dist[adjNode])
+            {
+                if(dist[adjNode] != 1e9)
+                    st.erase({dist[adjNode], adjNode});
 
-                        if(dist[adjNode] != 1e9){
-                            st.erase({dist[adjNode], adjNode});
-                        }
-
-			dist[adjNode] = dis + adjWt;
-			st.insert({dist[adjNode], adjNode});
-                    }
-                }
+                dist[adjNode] = dis + adjDis;
+                st.insert({dist[adjNode], adjNode});
             }
-
-            return dist;
         }
-};
+    }
+    return dist;
+}
 
 int main()
 {
-    int v = 3, s = 2;
-    vector<vector<int>> adj[v];
-    vector<int> v1{1, 1}, v2{2, 6}, v3{2, 3}, v4{0, 1}, v5{1, 3}, v6{0, 6};
-
-    adj[0].push_back(v1);
-    adj[0].push_back(v2);
-    adj[1].push_back(v3);
-    adj[1].push_back(v4);
-    adj[2].push_back(v5);
-    adj[2].push_back(v6);
+    int v = 3, source = 2;
+    vector<vector<int>> graph[v];
+    graph[0].push_back({1, 1});
+    graph[0].push_back({2, 6});
+    graph[1].push_back({2, 3});
+    graph[1].push_back({0, 1});
+    graph[2].push_back({1, 3});
+    graph[2].push_back({0, 6});
     
-    Solution obj;
-    vector<int> res = obj.dijkstra(v, adj, s);
+    vector<int> res = Dijkstra(v, graph, source);
+
+    cout << "Vertex \t Distance" << endl;
     for(int i=0; i<res.size(); i++){
-        cout << res[i] << " ";
+        cout << i << "\t\t" << res[i] << endl;
     }
-    cout << endl;
-	return 0;
+    return 0;
 }
