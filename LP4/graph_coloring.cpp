@@ -1,34 +1,62 @@
-#include<bits/stdc++.h>
+#include<bits/stdc++.h>>
 
 using namespace std;
 
-bool isSafe(int node, vector<int> &color, vector<vector<int>> &graph, int col){
-    for(int adjNode : graph[node]){
-        if(color[adjNode] == col)
-            return false;
-    }
-    return true;
-}
+class Solution
+{
+    int vertices;
+    vector<vector<int>> graph;
+    vector<int> color;
+    int minCol;
+    public:
+        Solution(int v, vector<vector<int>> g, vector<int> c, int minC){
+            vertices = v;
+            graph = g;
+            color = c;
+            minCol = minC;
+        }
 
-bool solve(int node, vector<int> &color, vector<vector<int>> &graph, int v, int m){
-    if(node == v)
-        return true;
+        bool isSafe(int node, int col){
+            for(int adjNode : graph[node]){
+                if(color[adjNode] == col)
+                    return false;
+            }
+            return true;
+        }
 
-    for(int i=1; i<=m; i++){
-        if(isSafe(node, color, graph, i)){
-            color[node] = i;
-            if(solve(node+1, color, graph, v, m))
-                return true;
+        void solve(int node, int numCol){
+            
+            if(numCol >= minCol)
+                return;
+
+            if(node == vertices)
+            {
+                for(int i=0; i<vertices; i++){
+                    cout << "Vertex " << i+1 << "  color ----> " << color[i] << endl; 
+                }
+                minCol = numCol;
+                cout << "Minimum number of colors needed: " << minCol << endl;
+                return;
+            }
+
+            for(int i=1; i<=numCol; i++){
+                if(isSafe(node, i)){
+                    color[node] = i;
+                    solve(node+1, numCol);
+                    color[node] = 0;
+                }
+            }
+
+            color[node] = numCol + 1;
+            solve(node + 1, numCol+1);
             color[node] = 0;
         }
-    }
+};
 
-    return false;
-}
 
 int main()
 {
-    int v = 4, col = 2;
+    int v = 4, minCol = 1e9;
     vector<vector<int>> graph(4);
     graph[0].push_back(1);
     graph[0].push_back(2);
@@ -41,6 +69,7 @@ int main()
     graph[3].push_back(0);
     graph[3].push_back(1);
     vector<int> color(v, 0);
-    cout << "Can color graph by " << col << " color : " << solve(0, color, graph, v, col);
+    Solution obj(v, graph, color, minCol);
+    obj.solve(0, 1);
     return 0;
 }
